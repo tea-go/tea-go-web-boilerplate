@@ -2,13 +2,17 @@ package json
 
 import (
 	"encoding/json"
+	"fmt"
+	"time"
 
 	"path"
 	"runtime"
 	"strconv"
 
 	"github.com/nanobox-io/golang-scribble"
+	"github.com/tea-go/tea-go-web-boilerplate/pkg/adding"
 	"github.com/tea-go/tea-go-web-boilerplate/pkg/listing"
+	"github.com/tea-go/tea-go-web-boilerplate/pkg/reviewing"
 )
 
 const (
@@ -41,6 +45,60 @@ func NewStorage() (*Storage, error) {
 	}
 
 	return s, nil
+}
+
+// AddBeer saves the given beer to the repository
+func (s *Storage) AddBeer(b adding.Beer) error {
+
+	existingBeers := s.GetAllBeers()
+	for _, e := range existingBeers {
+		if b.Abv == e.Abv &&
+			b.Brewery == e.Brewery &&
+			b.Name == e.Name {
+			return adding.ErrDuplicate
+		}
+	}
+
+	newB := Beer{
+		ID:        len(existingBeers) + 1,
+		Created:   time.Now(),
+		Name:      b.Name,
+		Brewery:   b.Brewery,
+		Abv:       b.Abv,
+		ShortDesc: b.ShortDesc,
+	}
+
+	resource := strconv.Itoa(newB.ID)
+	if err := s.db.Write(CollectionBeer, resource, newB); err != nil {
+		return err
+	}
+	return nil
+}
+
+// AddReview saves the given review in the repository
+func (s *Storage) AddReview(r reviewing.Review) error {
+
+	var beer Beer
+	if err := s.db.Read(CollectionBeer, strconv.Itoa(r.BeerID), &beer); err != nil {
+		return listing.ErrNotFound
+	}
+
+	created := time.Now()
+	newR := Review{
+		ID:        fmt.Sprintf("%d_%s_%s_%d", r.BeerID, r.FirstName, r.LastName, created.Unix()),
+		Created:   created,
+		BeerID:    r.BeerID,
+		FirstName: r.FirstName,
+		LastName:  r.LastName,
+		Score:     r.Score,
+		Text:      r.Text,
+	}
+
+	if err := s.db.Write(CollectionReview, newR.ID, r); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // GetBeer Get returns a beer with the specified ID
