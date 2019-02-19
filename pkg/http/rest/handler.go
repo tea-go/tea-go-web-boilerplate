@@ -1,18 +1,17 @@
 package rest
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
 
-	"github.com/julienschmidt/httprouter"
+	"github.com/gin-gonic/gin"
 	"github.com/tea-go/tea-go-web-boilerplate/pkg/listing"
 )
 
 // Handler handler all urls
 func Handler(l listing.Service) http.Handler {
-	router := httprouter.New()
+	router := gin.Default()
 
 	router.GET("/beers", getBeers(l))
 	router.GET("/beers/:id", getBeer(l))
@@ -22,46 +21,48 @@ func Handler(l listing.Service) http.Handler {
 }
 
 // getBeers returns a handler for GET /beers requests
-func getBeers(s listing.Service) func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		w.Header().Set("Content-Type", "application/json")
+func getBeers(s listing.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header("Content-Type", "application/json")
 		list := s.GetBeers()
-		json.NewEncoder(w).Encode(list)
+		c.JSON(http.StatusOK, list)
 	}
 }
 
 // getBeer returns a handler for GET /beers/:id requests
-func getBeer(s listing.Service) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		ID, err := strconv.Atoi(p.ByName("id"))
+func getBeer(s listing.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ID, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
-			http.Error(w, fmt.Sprintf("%s is not a valid beer ID, it must be a number.", p.ByName("id")), http.StatusBadRequest)
+			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("%s is not a valid beer ID, it must be a number.", c.Param("id"))})
 			return
 		}
 
 		beer, err := s.GetBeer(ID)
 		if err == listing.ErrNotFound {
-			http.Error(w, "The beer you requested does not exist.", http.StatusNotFound)
+			c.JSON(http.StatusNotFound, gin.H{"error": "The beer you requested does not exist."})
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(beer)
+		c.Header("Content-Type", "application/json")
+
+		c.JSON(http.StatusOK, beer)
 	}
 }
 
 // getBeerReviews returns a handler for GET /beers/:id/reviews requests
-func getBeerReviews(s listing.Service) func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		ID, err := strconv.Atoi(p.ByName("id"))
+func getBeerReviews(s listing.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ID, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
-			http.Error(w, fmt.Sprintf("%s is not a valid beer ID, it must be a number.", p.ByName("id")), http.StatusBadRequest)
+			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("%s is not a valid beer ID, it must be a number.", c.Param("id"))})
 			return
 		}
 
 		reviews := s.GetBeerReviews(ID)
 
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(reviews)
+		c.Header("Content-Type", "application/json")
+
+		c.JSON(http.StatusOK, reviews)
 	}
 }
