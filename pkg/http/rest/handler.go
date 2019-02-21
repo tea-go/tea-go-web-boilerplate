@@ -7,15 +7,26 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/tea-go/tea-go-web-boilerplate/pkg/listing"
+	"github.com/tea-go/tea-go-web-boilerplate/pkg/middleware"
+	"github.com/tea-go/tea-go-web-boilerplate/pkg/router"
 )
 
 // Handler handler all urls
 func Handler(l listing.Service) http.Handler {
-	router := gin.Default()
+	// 1. create a custom router
+	r := router.NewRouter()
 
-	router.GET("/beers", getBeers(l))
-	router.GET("/beers/:id", getBeer(l))
-	router.GET("/beers/:id/reviews", getBeerReviews(l))
+	router := r.Router()
+
+	// 2. add middlewares
+	middleware.NewMiddleware(router)
+
+	/* beer apis */
+	r.LIST("beer", "", getBeers(l))
+	r.DETAIL("beer", "", getBeer(l))
+
+	/* beer's review apis */
+	r.LIST("review", "beer", getBeerReviews(l))
 
 	return router
 }
@@ -34,6 +45,7 @@ func getBeer(s listing.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ID, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
+			fmt.Println("getBeer")
 			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("%s is not a valid beer ID, it must be a number.", c.Param("id"))})
 			return
 		}

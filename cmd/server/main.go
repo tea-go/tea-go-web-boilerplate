@@ -27,7 +27,6 @@ import (
 )
 
 func main() {
-
 	// error handling omitted for simplicity
 	s, _ := json.NewStorage()
 	lister := listing.NewService(s)
