@@ -1,6 +1,8 @@
 package reviewing
 
-type Payload []Review
+import "github.com/tea-go/tea-go-web-boilerplate/pkg/storage/mysql"
+
+type Payload []mysql.Review
 
 // Event defines possible outcomes from the "adding actor"
 type Event int
@@ -19,7 +21,7 @@ const (
 // Repository provides access to the review storage.
 type Repository interface {
 	// AddReview saves a given review.
-	AddReview(Review) error
+	AddReview(r mysql.Review) (*mysql.Review, error)
 }
 
 // Service provides reviewing operations.
@@ -44,7 +46,7 @@ func (s *service) AddSampleReviews(data Payload) <-chan Event {
 		defer close(results)
 
 		for _, b := range data {
-			err := s.rR.AddReview(b)
+			_, err := s.rR.AddReview(b)
 			if err != nil {
 				results <- Failed
 			}

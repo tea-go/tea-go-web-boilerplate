@@ -1,10 +1,11 @@
 package adding
 
 import (
-	"errors"
+	_errors "github.com/tea-go/tea-go-web-boilerplate/pkg/errors"
+	"github.com/tea-go/tea-go-web-boilerplate/pkg/storage/mysql"
 )
 
-type Payload []Beer
+type Payload []mysql.Beer
 
 // Event defines possible outcomes from the "adding actor"
 type Event int
@@ -37,8 +38,6 @@ func (e Event) GetMeaning() string {
 	return "Unknown result"
 }
 
-var ErrDuplicate = errors.New("beer already exists")
-
 // Service provides beer adding operations.
 type Service interface {
 	AddSampleBeers(Payload) <-chan Event
@@ -47,7 +46,8 @@ type Service interface {
 // Repository provides access to beer repository.
 type Repository interface {
 	// AddBeer saves a given beer to the repository.
-	AddBeer(Beer) error
+	// AddBeer(Beer) error
+	AddBeer(b mysql.Beer) (*mysql.Beer, error)
 }
 
 type service struct {
@@ -67,9 +67,9 @@ func (s *service) AddSampleBeers(data Payload) <-chan Event {
 		defer close(results)
 
 		for _, b := range data {
-			err := s.bR.AddBeer(b)
+			_, err := s.bR.AddBeer(b)
 			if err != nil {
-				if err == ErrDuplicate {
+				if err == _errors.ErrDuplicate {
 					// forgive the naughty error type checking above...
 					results <- BeerAlreadyExists
 					continue

@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	_errors "github.com/tea-go/tea-go-web-boilerplate/pkg/errors"
 	"github.com/tea-go/tea-go-web-boilerplate/pkg/listing"
 	"github.com/tea-go/tea-go-web-boilerplate/pkg/middleware"
 	"github.com/tea-go/tea-go-web-boilerplate/pkg/router"
@@ -51,7 +52,7 @@ func getBeer(s listing.Service) gin.HandlerFunc {
 		}
 
 		beer, err := s.GetBeer(ID)
-		if err == listing.ErrNotFound {
+		if err == _errors.ErrNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": "The beer you requested does not exist."})
 			return
 		}
