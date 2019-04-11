@@ -7,7 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/tea-go/tea-go-web-boilerplate/pkg/beer"
+	"github.com/tea-go/tea-go-web-boilerplate/pkg/http/beer"
+	"github.com/tea-go/tea-go-web-boilerplate/pkg/listing"
 	"github.com/tea-go/tea-go-web-boilerplate/pkg/router"
 	"github.com/tea-go/tea-go-web-boilerplate/pkg/storage"
 )
@@ -24,7 +25,9 @@ func main() {
 	})
 
 	// handle all beer's resources
-	beer.NewBeerRepository(s)
+
+	lister := listing.NewService(s)
+	r = beer.Handler(r, lister)
 
 	fmt.Println("The beer server is on tap now: http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", r.Router()))

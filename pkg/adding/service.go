@@ -1,11 +1,11 @@
 package adding
 
 import (
-	_errors "github.com/tea-go/tea-go-web-boilerplate/pkg/errors"
-	"github.com/tea-go/tea-go-web-boilerplate/pkg/storage/mysql"
-)
+	"fmt"
 
-type Payload []mysql.Beer
+	_errors "github.com/tea-go/tea-go-web-boilerplate/pkg/errors"
+	"github.com/tea-go/tea-go-web-boilerplate/pkg/storage"
+)
 
 // Event defines possible outcomes from the "adding actor"
 type Event int
@@ -40,14 +40,14 @@ func (e Event) GetMeaning() string {
 
 // Service provides beer adding operations.
 type Service interface {
-	AddSampleBeers(Payload) <-chan Event
+	AddSampleBeers([]storage.Beer) <-chan Event
 }
 
 // Repository provides access to beer repository.
 type Repository interface {
 	// AddBeer saves a given beer to the repository.
 	// AddBeer(Beer) error
-	AddBeer(b mysql.Beer) (*mysql.Beer, error)
+	AddBeer(b storage.Beer) (*storage.Beer, error)
 }
 
 type service struct {
@@ -60,8 +60,10 @@ func NewService(r Repository) Service {
 }
 
 // AddSampleBeers adds some sample beers to the database
-func (s *service) AddSampleBeers(data Payload) <-chan Event {
+func (s *service) AddSampleBeers(data []storage.Beer) <-chan Event {
 	results := make(chan Event)
+
+	fmt.Println(1)
 
 	go func() {
 		defer close(results)

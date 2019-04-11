@@ -1,4 +1,4 @@
-package mysql
+package storage
 
 import (
 	"github.com/jinzhu/gorm"

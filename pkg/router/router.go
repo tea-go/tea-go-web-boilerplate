@@ -14,6 +14,7 @@ type Routes interface {
 	PUT(res string, _path string, handlers ...gin.HandlerFunc) gin.IRoutes
 	PATCH(res string, _path string, handlers ...gin.HandlerFunc) gin.IRoutes
 	DELETE(res string, _path string, handlers ...gin.HandlerFunc) gin.IRoutes
+	Use(middlewares []gin.HandlerFunc) *gin.Engine
 	Router() *gin.Engine
 }
 
@@ -32,6 +33,13 @@ func NewRouter() Routes {
 // Router get a gin.engine pointer
 func (r *router) Router() *gin.Engine {
 	return r.engine
+}
+
+func (r *router) Use(middlewares []gin.HandlerFunc) *gin.Engine {
+	if middlewares != nil && len(middlewares) > 0 {
+		r.engine.Use(middlewares...);
+	}
+	return r.engine;
 }
 
 // LIST define a list method

@@ -1,4 +1,4 @@
-package mysql
+package storage
 
 import (
 	"fmt"
@@ -53,6 +53,7 @@ func (s *Storage) AutoMigrate() *Storage {
 // AddBeer add a beer to mysql
 func (s *Storage) AddBeer(b Beer) (*Beer, error) {
 	existingBeers := s.GetAllBeers()
+
 	for _, e := range existingBeers {
 		if (b.Abv == e.Abv) &&
 			b.Brewery == e.Brewery &&

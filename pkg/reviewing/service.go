@@ -1,8 +1,6 @@
 package reviewing
 
-import "github.com/tea-go/tea-go-web-boilerplate/pkg/storage/mysql"
-
-type Payload []mysql.Review
+import "github.com/tea-go/tea-go-web-boilerplate/pkg/storage"
 
 // Event defines possible outcomes from the "adding actor"
 type Event int
@@ -21,12 +19,12 @@ const (
 // Repository provides access to the review storage.
 type Repository interface {
 	// AddReview saves a given review.
-	AddReview(r mysql.Review) (*mysql.Review, error)
+	AddReview(r storage.Review) (*storage.Review, error)
 }
 
 // Service provides reviewing operations.
 type Service interface {
-	AddSampleReviews(Payload) <-chan Event
+	AddSampleReviews([]storage.Review) <-chan Event
 }
 
 type service struct {
@@ -39,7 +37,7 @@ func NewService(r Repository) Service {
 }
 
 // AddSampleReviews adds some sample reviews to the database
-func (s *service) AddSampleReviews(data Payload) <-chan Event {
+func (s *service) AddSampleReviews(data []storage.Review) <-chan Event {
 	results := make(chan Event)
 
 	go func() {

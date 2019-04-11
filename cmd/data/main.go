@@ -2,19 +2,20 @@ package main
 
 import (
 	"fmt"
+
 	"time"
 
 	"github.com/tea-go/tea-go-web-boilerplate/pkg/adding"
 	"github.com/tea-go/tea-go-web-boilerplate/pkg/reviewing"
-	"github.com/tea-go/tea-go-web-boilerplate/pkg/storage/json"
+	"github.com/tea-go/tea-go-web-boilerplate/pkg/storage"
 )
 
 type Message interface{}
 
 func main() {
-
-	// error handling omitted for simplicity
-	s, _ := json.NewStorage()
+	// create a mysql storage
+	s, _ := storage.NewStorage()
+	s.AutoMigrate()
 
 	// create the available services
 	adder := adding.NewService(s)       // adding "actor"
@@ -34,10 +35,6 @@ func main() {
 			fmt.Printf("Added sample review with result %d.\n", result) // machine-friendly
 		}
 	}()
-
-	// main could have its own "mailbox" exposed, for example an HTTP endpoint,
-	// so we could be waiting here for more sample data to be added
-	// (but we'll just exit for simplicity)
 
 	time.Sleep(2 * time.Second) // this is here just to get the output from goroutines printed
 

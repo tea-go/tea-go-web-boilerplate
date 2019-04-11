@@ -1,6 +1,8 @@
 package adding
 
-var DefaultBeers = []Beer{
+import "github.com/tea-go/tea-go-web-boilerplate/pkg/storage"
+
+var DefaultBeers = []storage.Beer{
 	{
 		Name:    "Pliny the Elder",
 		Brewery: "Russian River Brewing Company",
