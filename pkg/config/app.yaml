@@ -1,0 +1,8 @@
+# the app configuration
+mode: "debug"
+# the db configurations
+db_name: "teagodev"
+db_user: "root"
+db_pass: "12345678"
+# the logger configurations
+logger_level: "debug"

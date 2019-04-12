@@ -1,4 +1,4 @@
-package storage
+package models
 
 import (
 	"github.com/jinzhu/gorm"
@@ -11,4 +11,5 @@ type Beer struct {
 	Brewery   string  `json:"brewery"`
 	Abv       float32 `json:"abv"`
 	ShortDesc string  `json:"short_description"`
+	IsDelete  string  `json:"isDelete"`
 }

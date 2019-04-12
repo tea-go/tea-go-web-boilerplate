@@ -37,9 +37,9 @@ func (r *router) Router() *gin.Engine {
 
 func (r *router) Use(middlewares []gin.HandlerFunc) *gin.Engine {
 	if middlewares != nil && len(middlewares) > 0 {
-		r.engine.Use(middlewares...);
+		r.engine.Use(middlewares...)
 	}
-	return r.engine;
+	return r.engine
 }
 
 // LIST define a list method
