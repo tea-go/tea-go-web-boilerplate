@@ -46,7 +46,7 @@ func NewDB() (*db, error) {
 
 // AutoMigrate automatically migrate schemas
 func (s *db) AutoMigrate() *db {
-	s.db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&Beer{}, &Review{})
+	s.db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&User{})
 	return s
 }
 

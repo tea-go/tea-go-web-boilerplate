@@ -26,7 +26,10 @@ func main() {
 
 	// create a mysql storage
 	s, _ := models.NewDB()
-	s.AutoMigrate()
+
+	if gin.Mode() != "release" {
+		s.AutoMigrate()
+	}
 
 	// create the logger
 	logger := logrus.New()
@@ -38,9 +41,9 @@ func main() {
 	})
 
 	// handle all beer's resources
-	beerDao := daos.NewBeerDao()
-	beerService := services.NewBeerService(beerDao)
-	handlers.HanldeBeerResource(r, beerService)
+	userDAO := daos.NewUserDAO()
+	userService := services.NewUserService(userDAO)
+	handlers.HanldeUserResource(r, userService)
 
 	port := fmt.Sprintf(":%d", app.Config.ServerPort)
 
