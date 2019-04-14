@@ -15,6 +15,7 @@ type (
 		Query(rs app.RequestScope, offset, limit int) []models.User
 		Count(rs app.RequestScope) int
 		Get(rs app.RequestScope, id int) *models.User
+		Create(rs app.RequestScope, user *models.User) (*models.User, error)
 	}
 
 	userResource struct {
@@ -28,11 +29,12 @@ func HanldeUserResource(r router.Routes, service userService) router.Routes {
 
 	r.LIST("user", "", resource.users)
 	r.DETAIL("user", "", resource.user)
+	r.POST("user", "", resource.create)
 
 	return r
 }
 
-// get users returns a handler for GET /users requests
+// users return all users
 func (r *userResource) users(c *gin.Context) {
 	rs := app.GetRequestScope(c)
 
@@ -75,7 +77,7 @@ func (r *userResource) users(c *gin.Context) {
 	})
 }
 
-// get users returns a handler for GET /users requests
+// user return a user's detail
 func (r *userResource) user(c *gin.Context) {
 	rs := app.GetRequestScope(c)
 
@@ -99,6 +101,39 @@ func (r *userResource) user(c *gin.Context) {
 		"message":    "ok",
 		"data":       user,
 	})
-	return
+}
 
+// create create a user
+func (r *userResource) create(c *gin.Context) {
+	rs := app.GetRequestScope(c)
+
+	var user models.User
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":     "failed",
+			"statusCode": http.StatusBadRequest,
+			"message":    err.Error(),
+			"data":       nil,
+		})
+		return
+	}
+
+	data, err := r.service.Create(rs, &user)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status":     "failed",
+			"statusCode": http.StatusBadRequest,
+			"message":    err.Error(),
+			"data":       nil,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":     "success",
+		"statusCode": http.StatusOK,
+		"message":    "ok",
+		"data":       data,
+	})
 }

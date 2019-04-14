@@ -29,6 +29,7 @@ func main() {
 
 	if gin.Mode() != "release" {
 		s.AutoMigrate()
+		s.DB().LogMode(true)
 	}
 
 	// create the logger

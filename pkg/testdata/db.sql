@@ -7,17 +7,17 @@ CREATE TABLE `user` (
   `email` varchar(100) NOT NULL,
   `role` enum('admin','member') NOT NULL DEFAULT 'member',
   `status` enum('disabled','enabled') NOT NULL DEFAULT 'enabled',
-  `language` varchar(255) NOT NULL DEFAULT 'zh',
-  `isDelete` enum('yes','no') NOT NULL DEFAULT 'no',
-  `createdAt` datetime NOT NULL,
-  `updatedAt` datetime NOT NULL,
+  `language` varchar(10) NOT NULL DEFAULT 'zh',
+  `is_deleted` enum('yes','no') NOT NULL DEFAULT 'no',
+  `created_at` datetime NOT NULL,
+  `updated_at` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB CHARSET=utf8 COMMENT='用户表';
 
 LOCK TABLES `user` WRITE;
 
-INSERT INTO `user` (`id`, `name`, `avatar`, `email`, `role`, `status`, `language`, `isDelete`, `createdAt`, `updatedAt`)
+INSERT INTO `user` (`id`, `name`, `avatar`, `email`, `role`, `status`, `language`, `is_deleted`, `created_at`, `updated_at`)
 VALUES
 	(1, 'baiyu', NULL, 'baiyu@admaster.com.cn', 'admin', 'enabled', 'zh', 'no', '2019-01-01 00:00:00', '2019-01-01 00:00:01'),
 	(2, 'jason', NULL, 'jason@admaster.com.cn', 'member', 'enabled', 'zh', 'no', '2019-01-01 00:00:00', '2019-01-01 00:00:01');

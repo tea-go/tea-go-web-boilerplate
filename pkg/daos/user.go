@@ -1,6 +1,8 @@
 package daos
 
 import (
+	"time"
+
 	"github.com/tea-go/tea-go-web-boilerplate/pkg/app"
 	"github.com/tea-go/tea-go-web-boilerplate/pkg/models"
 )
@@ -22,11 +24,20 @@ func (dao *UserDAO) Get(rs app.RequestScope, id int) *models.User {
 	return &user
 }
 
+// GetByEmail get a user by email
+func (dao *UserDAO) GetByEmail(rs app.RequestScope, email string) *models.User {
+	var user models.User
+
+	rs.Tx().Where("email = ?", email).First(&user)
+
+	return &user
+}
+
 // Query get all Users from db
 func (dao *UserDAO) Query(rs app.RequestScope, offset, limit int) []models.User {
 	var users []models.User
 
-	rs.Tx().Where("isDelete = ?", "no").Find(&users).Offset(offset).Limit(limit)
+	rs.Tx().Where("is_deleted = ?", "no").Find(&users).Offset(offset).Limit(limit)
 
 	return users
 }
@@ -36,7 +47,29 @@ func (dao *UserDAO) Count(rs app.RequestScope) int {
 	var Users []models.User
 	var count int
 
-	rs.Tx().Where("isDelete = ?", "no").Find(&Users).Count(&count)
+	rs.Tx().Where("is_deleted = ?", "no").Find(&Users).Count(&count)
 
 	return count
+}
+
+// Create create a user
+func (dao *UserDAO) Create(rs app.RequestScope, user *models.User) *models.User {
+	user.ID = 0
+
+	now := time.Now()
+
+	user.CreatedAt = now
+	user.UpdatedAt = now
+
+	if user.IsDeleted == "" {
+		user.IsDeleted = "no"
+	}
+
+	if user.Status == "" {
+		user.Status = "enabled"
+	}
+
+	rs.Tx().Create(user)
+
+	return user
 }
