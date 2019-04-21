@@ -7,7 +7,7 @@ CREATE TABLE `user` (
   `email` varchar(100) NOT NULL,
   `role` enum('admin','member') NOT NULL DEFAULT 'member',
   `status` enum('disabled','enabled') NOT NULL DEFAULT 'enabled',
-  `language` varchar(10) NOT NULL DEFAULT 'zh',
+  `language` varchar(50) NOT NULL DEFAULT 'zh',
   `is_deleted` enum('yes','no') NOT NULL DEFAULT 'no',
   `created_at` datetime NOT NULL,
   `updated_at` datetime NOT NULL,
@@ -19,5 +19,5 @@ LOCK TABLES `user` WRITE;
 
 INSERT INTO `user` (`id`, `name`, `avatar`, `email`, `role`, `status`, `language`, `is_deleted`, `created_at`, `updated_at`)
 VALUES
-	(1, 'baiyu', NULL, 'baiyu@admaster.com.cn', 'admin', 'enabled', 'zh', 'no', '2019-01-01 00:00:00', '2019-01-01 00:00:01'),
-	(2, 'jason', NULL, 'jason@admaster.com.cn', 'member', 'enabled', 'zh', 'no', '2019-01-01 00:00:00', '2019-01-01 00:00:01');
+	(1, 'baiyu', NULL, 'baiyu@qq.com', 'admin', 'enabled', 'zh', 'no', '2019-01-01 00:00:00', '2019-01-01 00:00:01'),
+	(2, 'jason', NULL, 'jason@qq.com', 'member', 'enabled', 'zh', 'no', '2019-01-01 00:00:00', '2019-01-01 00:00:01');

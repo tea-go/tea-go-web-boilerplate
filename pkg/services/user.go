@@ -6,11 +6,13 @@ import (
 )
 
 type userDAO interface {
-	Query(rs app.RequestScope, offset, limit int) []models.User
-	Count(rs app.RequestScope) int
-	Get(rs app.RequestScope, id int) *models.User
-	GetByEmail(rs app.RequestScope, email string) *models.User
-	Create(rs app.RequestScope, user *models.User) *models.User
+	Query(rs app.RequestScope, offset, limit int) ([]models.User, error)
+	Count(rs app.RequestScope) (int, error)
+	Get(rs app.RequestScope, id int) (*models.User, error)
+	GetByEmail(rs app.RequestScope, email string) (*models.User, error)
+	Create(rs app.RequestScope, user *models.User) error
+	Update(rs app.RequestScope, id int, user *models.User) error
+	Delete(rs app.RequestScope, id int) error
 }
 
 // UserService a struct of user service
@@ -24,17 +26,17 @@ func NewUserService(dao userDAO) *UserService {
 }
 
 // Query get all users from dao
-func (bs *UserService) Query(rs app.RequestScope, offset, limit int) []models.User {
+func (bs *UserService) Query(rs app.RequestScope, offset, limit int) ([]models.User, error) {
 	return bs.dao.Query(rs, offset, limit)
 }
 
 // Count get the count of user
-func (bs *UserService) Count(rs app.RequestScope) int {
+func (bs *UserService) Count(rs app.RequestScope) (int, error) {
 	return bs.dao.Count(rs)
 }
 
 // Get get all users from dao
-func (bs *UserService) Get(rs app.RequestScope, id int) *models.User {
+func (bs *UserService) Get(rs app.RequestScope, id int) (*models.User, error) {
 	return bs.dao.Get(rs, id)
 }
 
@@ -44,11 +46,41 @@ func (bs *UserService) Create(rs app.RequestScope, user *models.User) (*models.U
 		return nil, err
 	}
 
-	if data := bs.dao.GetByEmail(rs, user.Email); data != nil {
-		return data, nil
+	existedUser, err := bs.dao.GetByEmail(rs, user.Email)
+
+	if err == nil {
+		return existedUser, nil
 	}
 
-	data := bs.dao.Create(rs, user)
+	if err := bs.dao.Create(rs, user); err != nil {
+		return nil, err
+	}
 
-	return data, nil
+	return user, nil
+}
+
+// Update update a user
+func (bs *UserService) Update(rs app.RequestScope, id int, user *models.User) (*models.User, error) {
+	if err := user.Validate(); err != nil {
+		return nil, err
+	}
+
+	if err := bs.dao.Update(rs, id, user); err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+// Delete delete a user by id
+func (bs *UserService) Delete(rs app.RequestScope, id int) (*models.User, error) {
+	user, err := bs.Get(rs, id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = bs.dao.Delete(rs, id)
+
+	return user, err
 }

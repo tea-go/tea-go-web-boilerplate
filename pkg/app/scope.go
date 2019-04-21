@@ -14,6 +14,8 @@ type RequestScope interface {
 	Logger
 	// UserID returns the ID of the user for the current request
 	UserID() string
+	// UserRole returns the role of the user for the current request
+	UserRole() string
 	// SetUserID sets the ID of the currently authenticated user
 	SetUserID(id string)
 	// RequestID returns the ID of the current request
@@ -35,12 +37,17 @@ type requestScope struct {
 	now       time.Time // the time when the request is being processed
 	requestID string    // an ID identifying one or multiple correlated HTTP requests
 	userID    string    // an ID identifying the current user
+	userRole  string    // role of the current user
 	rollback  bool      // whether to roll back the current transaction
 	tx        *gorm.DB  // the currently active transaction
 }
 
 func (rs *requestScope) UserID() string {
 	return rs.userID
+}
+
+func (rs *requestScope) UserRole() string {
+	return rs.userRole
 }
 
 func (rs *requestScope) SetUserID(id string) {
